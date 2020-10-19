@@ -10,7 +10,7 @@ server_sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 server_sock.bind((server_address, port))
 server_sock.listen(1)
 
-try:
+while True:
     client_sock, address = server_sock.accept()
     print(f"Accepted connection from {address}")
 
@@ -25,11 +25,18 @@ try:
 
                 # execute the command
                 print(f"Executing: {cmd}")
-                output = subprocess.getoutput(cmd)
+
+                # split the cmd into a list
+                res = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = res.communicate()
 
                 # send output back
-                client_sock.send(output.encode())
+                if stdout:
+                    client_sock.send(f"STDOUT:\n{stdout.decode()}")
+
+                if stderr:
+                    client_sock.send(f"\nSTDERR:\n{stderr.decode()}")
     finally:
         client_sock.close()
-finally:
-    server_sock.close()
+
+server_sock.close()
