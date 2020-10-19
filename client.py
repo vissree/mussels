@@ -16,9 +16,8 @@ print("Connected...")
 
 try:
     while True:
-        data = input()
-        sock.send(data.encode())
-        data = sock.recv(1024).decode()
-        print(f"Data received: {data}")
+        cmd = input()
+        sock.send(cmd.encode())
+        print(sock.recv(1024).decode())
 finally:
     sock.close()
